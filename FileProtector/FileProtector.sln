@@ -1,0 +1,27 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30204.135
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "FileProtector", "FileProtector\FileProtector.vcxproj", "{728DFAD2-F73B-4D97-87DD-E735051670E0}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|x64 = Debug|x64
+		Release|x64 = Release|x64
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{728DFAD2-F73B-4D97-87DD-E735051670E0}.Debug|x64.ActiveCfg = Debug|x64
+		{728DFAD2-F73B-4D97-87DD-E735051670E0}.Debug|x64.Build.0 = Debug|x64
+		{728DFAD2-F73B-4D97-87DD-E735051670E0}.Debug|x64.Deploy.0 = Debug|x64
+		{728DFAD2-F73B-4D97-87DD-E735051670E0}.Release|x64.ActiveCfg = Release|x64
+		{728DFAD2-F73B-4D97-87DD-E735051670E0}.Release|x64.Build.0 = Release|x64
+		{728DFAD2-F73B-4D97-87DD-E735051670E0}.Release|x64.Deploy.0 = Release|x64
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {04F5DD66-B544-4836-B795-FEBB6419D616}
+	EndGlobalSection
+EndGlobal
