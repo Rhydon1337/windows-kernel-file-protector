@@ -15,7 +15,7 @@ $TEST_MACHINE_IP="192.168.112.129"
 
 $REMOTE_DIR_PRODUCT="C:\"
 $REMOTE_DRIVER_PATH="$REMOTE_DIR_PRODUCT\Debug\$PROJECT_NAME.sys"
-$CREATE_SERVICE="sc create DriverSrv type=kernel binPath=`"$REMOTE_DRIVER_PATH`""
+$CREATE_SERVICE="sc create DriverSrv type=filesys binPath=`"$REMOTE_DRIVER_PATH`""
 $START_SERVICE="sc start DriverSrv"
 
 $DEBUG_PORT="55555"
@@ -44,6 +44,9 @@ pscp -batch -q -r -P 22 -pw $TEST_MACHINE_PASSWORD `"$BUILD_DIRECOTY`" $TEST_MAC
 
 Write-Host "[+] Loading the driver"
 plink -batch -P 22 -pw $TEST_MACHINE_PASSWORD $TEST_MACHINE_USERNAME`@$TEST_MACHINE_IP "$CREATE_SERVICE"
+Start-Sleep -Seconds 2
+plink -batch -P 22 -pw $TEST_MACHINE_PASSWORD $TEST_MACHINE_USERNAME`@$TEST_MACHINE_IP "rundll32 syssetup.dll,SetupInfObjectInstallAction DefaultInstall 128 C:\Debug\FileProtector.inf"
+Start-Sleep -Seconds 2
 plink -batch -P 22 -pw $TEST_MACHINE_PASSWORD $TEST_MACHINE_USERNAME`@$TEST_MACHINE_IP "$START_SERVICE"
 
 $WINDBG_SCRIPT="$PSScriptRoot\script.txt"
