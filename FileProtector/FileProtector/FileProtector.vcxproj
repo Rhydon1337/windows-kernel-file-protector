@@ -151,10 +151,12 @@
     <FilesToPackage Include="$(TargetPath)" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="FileNameInfo.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="mini_filter.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="FileNameInfo.h" />
     <ClInclude Include="mini_filter.h" />
   </ItemGroup>
   <ItemGroup>

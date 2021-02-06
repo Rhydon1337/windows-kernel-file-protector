@@ -25,9 +25,15 @@
     <ClCompile Include="mini_filter.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="FileNameInfo.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="mini_filter.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="FileNameInfo.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
