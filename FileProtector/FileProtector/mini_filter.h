@@ -9,6 +9,11 @@ extern  "C" FLT_PREOP_CALLBACK_STATUS FLTAPI pre_createfile(
 	_In_ PCFLT_RELATED_OBJECTS FltObjects,
 	_Flt_CompletionContext_Outptr_ PVOID* CompletionContext);
 
+extern  "C" FLT_PREOP_CALLBACK_STATUS FLTAPI pre_writefile(
+	_Inout_ PFLT_CALLBACK_DATA Data,
+	_In_ PCFLT_RELATED_OBJECTS FltObjects,
+	_Flt_CompletionContext_Outptr_ PVOID * CompletionContext);
+
 extern  "C" FLT_PREOP_CALLBACK_STATUS pre_set_information(
 	_Inout_ PFLT_CALLBACK_DATA Data, _In_ PCFLT_RELATED_OBJECTS FltObjects, PVOID*);
 
@@ -19,6 +24,12 @@ CONST FLT_OPERATION_REGISTRATION g_callbacks[] = {
 		IRP_MJ_CREATE,
 		0,
 		pre_createfile,
+		0
+	},
+	{
+		IRP_MJ_WRITE,
+		0,
+		pre_writefile,
 		0
 	},
 	{

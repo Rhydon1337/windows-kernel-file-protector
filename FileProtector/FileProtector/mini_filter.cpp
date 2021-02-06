@@ -3,10 +3,10 @@
 PFLT_FILTER g_minifilter_handle = nullptr;
 
 bool should_protect(const wchar_t* file_name) {
-	if (nullptr != wcsstr(file_name,L"_protected")) {
-		return true;
+	if (nullptr == file_name) {
+		return false;
 	}
-	if (nullptr != wcsstr(file_name, L"_PROT~1")) {
+	if (nullptr != wcsstr(file_name,L"_protected")) {
 		return true;
 	}
 	return false;
@@ -14,13 +14,40 @@ bool should_protect(const wchar_t* file_name) {
 
 FLT_PREOP_CALLBACK_STATUS pre_createfile(PFLT_CALLBACK_DATA Data, PCFLT_RELATED_OBJECTS,
 	PVOID*) {
-	
-	if (Data->Iopb->Parameters.Create.Options & FILE_DELETE_ON_CLOSE) {
-		KdPrint(("Delete operation: %wZ\n", &Data->Iopb->TargetFileObject->FileName));
-		if (should_protect(Data->Iopb->TargetFileObject->FileName.Buffer)) {
-			Data->IoStatus.Status = STATUS_ACCESS_DENIED;
-			return FLT_PREOP_COMPLETE;
+
+	PFLT_FILE_NAME_INFORMATION file_name_information;
+	auto status = FltGetFileNameInformation(Data, FLT_FILE_NAME_NORMALIZED | FLT_FILE_NAME_QUERY_DEFAULT, &file_name_information);
+	if (NT_SUCCESS(status)) {
+		status = FltParseFileNameInformation(file_name_information);
+		if (NT_SUCCESS(status)) {
+			if (Data->Iopb->Parameters.Create.Options & FILE_DELETE_ON_CLOSE) {
+				KdPrint(("Delete operation: %wZ\n", &file_name_information->Name));
+				if (should_protect(file_name_information->Name.Buffer)) {
+					Data->IoStatus.Status = STATUS_ACCESS_DENIED;
+					return FLT_PREOP_COMPLETE;
+				}
+			}
 		}
+		FltReleaseFileNameInformation(file_name_information);
+	}
+	
+	return FLT_PREOP_SUCCESS_NO_CALLBACK;
+}
+
+FLT_PREOP_CALLBACK_STATUS pre_writefile(PFLT_CALLBACK_DATA Data, PCFLT_RELATED_OBJECTS, PVOID*) {
+	KdPrint(("Write operation: %wZ\n", &Data->Iopb->TargetFileObject->FileName));
+	PFLT_FILE_NAME_INFORMATION file_name_information;
+	auto status = FltGetFileNameInformation(Data, FLT_FILE_NAME_NORMALIZED | FLT_FILE_NAME_QUERY_DEFAULT, &file_name_information);
+	if (NT_SUCCESS(status)) {
+		status = FltParseFileNameInformation(file_name_information);
+		if (NT_SUCCESS(status)) {
+			KdPrint(("Write operation: %wZ\n", &file_name_information->Name));
+			if (should_protect(file_name_information->Name.Buffer)) {
+				Data->IoStatus.Status = STATUS_ACCESS_DENIED;
+				return FLT_PREOP_COMPLETE;
+			}
+		}
+		FltReleaseFileNameInformation(file_name_information);
 	}
 	return FLT_PREOP_SUCCESS_NO_CALLBACK;
 }
@@ -33,10 +60,18 @@ FLT_PREOP_CALLBACK_STATUS pre_set_information(
 	if (params.FileInformationClass != FileDispositionInformation &&
 		params.FileInformationClass != FileDispositionInformationEx) {
 		if (params.FileInformationClass == FileRenameInformation) {
-			KdPrint(("Rename operation: %wZ\n", &Data->Iopb->TargetFileObject->FileName));
-			if (should_protect(Data->Iopb->TargetFileObject->FileName.Buffer)) {
-				Data->IoStatus.Status = STATUS_ACCESS_DENIED;
-				return FLT_PREOP_COMPLETE;
+			PFLT_FILE_NAME_INFORMATION file_name_information;
+			auto status = FltGetFileNameInformation(Data, FLT_FILE_NAME_NORMALIZED | FLT_FILE_NAME_QUERY_DEFAULT, &file_name_information);
+			if (NT_SUCCESS(status)) {
+				status = FltParseFileNameInformation(file_name_information);
+				if (NT_SUCCESS(status)) {
+					KdPrint(("Rename operation: %wZ\n", &file_name_information->Name));
+					if (should_protect(file_name_information->Name.Buffer)) {
+						Data->IoStatus.Status = STATUS_ACCESS_DENIED;
+						return FLT_PREOP_COMPLETE;
+					}
+				}
+				FltReleaseFileNameInformation(file_name_information);
 			}
 		}
 		return FLT_PREOP_SUCCESS_NO_CALLBACK;
@@ -47,12 +82,20 @@ FLT_PREOP_CALLBACK_STATUS pre_set_information(
 		return FLT_PREOP_SUCCESS_NO_CALLBACK;
 	}
 	// If we got till here it means that it delete operation
-	KdPrint(("Delete operation: %wZ\n", &Data->Iopb->TargetFileObject->FileName));
-	if (should_protect(Data->Iopb->TargetFileObject->FileName.Buffer)) {
-		Data->IoStatus.Status = STATUS_ACCESS_DENIED;
-		return FLT_PREOP_COMPLETE;
+	PFLT_FILE_NAME_INFORMATION file_name_information;
+	auto status = FltGetFileNameInformation(Data, FLT_FILE_NAME_NORMALIZED | FLT_FILE_NAME_QUERY_DEFAULT, &file_name_information);
+	if (NT_SUCCESS(status)) {
+		status = FltParseFileNameInformation(file_name_information);
+		if (NT_SUCCESS(status)) {
+			KdPrint(("Delete operation: %wZ\n", &file_name_information->Name));
+			if (should_protect(file_name_information->Name.Buffer)) {
+				Data->IoStatus.Status = STATUS_ACCESS_DENIED;
+				return FLT_PREOP_COMPLETE;
+			}
+		}
+		FltReleaseFileNameInformation(file_name_information);
 	}
-
+	
 	return FLT_PREOP_SUCCESS_NO_CALLBACK;
 }
 
